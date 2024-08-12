@@ -1,0 +1,110 @@
+{
+  "info": {
+    "version": "1.0",
+    "title": "LA Todo API",
+    "basePath": "/api"
+  },
+  "host": "localhost:4000",
+  "definitions": {
+    "Task": {
+      "description": "A task of the application",
+      "properties": {
+        "details": {
+          "description": "Task details",
+          "type": "string"
+        },
+        "order": {
+          "description": "Task order",
+          "type": "number"
+        },
+        "status": {
+          "description": "Task status",
+          "type": "string"
+        },
+        "title": {
+          "description": "Task title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "order",
+        "status",
+        "details",
+        "title"
+      ],
+      "title": "Task",
+      "type": "object"
+    }
+  },
+  "paths": {
+    "/api/tasks": {
+      "get": {
+        "description": "List of tasks",
+        "operationId": "LatodoApiWeb.TaskController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Task"
+        ]
+      },
+      "post": {
+        "description": "Create tasks with params",
+        "operationId": "create_tasks",
+        "parameters": [
+          {
+            "description": "Title",
+            "in": "query",
+            "name": "title",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Details",
+            "in": "query",
+            "name": "details",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Order",
+            "in": "query",
+            "name": "order",
+            "required": true,
+            "type": "number"
+          },
+          {
+            "description": "Status",
+            "in": "query",
+            "name": "status",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Task"
+            }
+          },
+          "400": {
+            "description": "Client Error"
+          }
+        },
+        "summary": "Create tasks",
+        "tags": [
+          "Task"
+        ]
+      }
+    }
+  },
+  "swagger": "2.0"
+}

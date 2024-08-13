@@ -47,6 +47,11 @@
             "description": "Success"
           }
         },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "",
         "tags": [
           "Task"
@@ -99,12 +104,102 @@
             "description": "Client Error"
           }
         },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Create tasks",
+        "tags": [
+          "Task"
+        ]
+      }
+    },
+    "/api/tasks/{id}": {
+      "delete": {
+        "description": "Remove a task from the system",
+        "operationId": "delete_task",
+        "parameters": [
+          {
+            "description": "The id of the task",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete a task",
+        "tags": [
+          "Task"
+        ]
+      },
+      "patch": {
+        "description": "Update an existing task with params",
+        "operationId": "update_task",
+        "parameters": [
+          {
+            "description": "Task ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "description": "The task details to update",
+            "in": "body",
+            "name": "task",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/Task"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Task"
+            }
+          },
+          "400": {
+            "description": "Client Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Updates an existing task",
         "tags": [
           "Task"
         ]
       }
     }
   },
-  "swagger": "2.0"
+  "swagger": "2.0",
+  "securityDefinitions": {
+    "Bearer": {
+      "in": "header",
+      "name": "Authorization",
+      "type": "apiKey",
+      "description": "API Token must be provided via `Authorization: Bearer ` header"
+    }
+  }
 }

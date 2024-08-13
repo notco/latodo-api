@@ -5,7 +5,7 @@ defmodule LatodoApiWeb.TaskController do
   alias LatodoApi.Todos.Task
 
   import Plug.Conn.Status, only: [code: 1]
-  use PhoenixSwagger
+  use PhoenixSwagger, except: [:delete]
 
   action_fallback LatodoApiWeb.FallbackController
 
@@ -30,6 +30,7 @@ defmodule LatodoApiWeb.TaskController do
     get("/api/tasks")
     description("List of tasks")
     response(code(:ok), "Success")
+    security([%{Bearer: []}])
   end
 
   def index(conn, _params) do
@@ -42,6 +43,7 @@ defmodule LatodoApiWeb.TaskController do
     summary("Create tasks")
     description("Create tasks with params")
     produces("application/json")
+    security([%{Bearer: []}])
     operation_id("create_tasks")
 
     parameters do
@@ -69,12 +71,45 @@ defmodule LatodoApiWeb.TaskController do
     render(conn, :show, task: task)
   end
 
-  def update(conn, %{"id" => id, "task" => task_params}) do
+  swagger_path :update do
+    patch("/api/tasks/{id}")
+    summary("Updates an existing task")
+    description("Update an existing task with params")
+    produces("application/json")
+    security([%{Bearer: []}])
+    operation_id("update_task")
+
+    parameters do
+      id(:path, :integer, "Task ID", required: true)
+      task(:body, Schema.ref(:Task), "The task details to update")
+    end
+
+    response(200, "OK", Schema.ref(:Task))
+    response(400, "Client Error")
+  end
+
+  def update(conn, %{"id" => id} = params) do
     task = Todos.get_task!(id)
+    task_params = Map.drop(params, ["id"])
 
     with {:ok, %Task{} = task} <- Todos.update_task(task, task_params) do
       render(conn, :show, task: task)
     end
+  end
+
+  swagger_path :delete do
+    PhoenixSwagger.Path.delete("/api/tasks/{id}")
+    summary("Delete a task")
+    description("Remove a task from the system")
+    operation_id("delete_task")
+    security([%{Bearer: []}])
+
+    parameters do
+      id(:path, :string, "The id of the task", required: true)
+    end
+
+    response(204, "No content")
+    response(404, "Not found")
   end
 
   def delete(conn, %{"id" => id}) do

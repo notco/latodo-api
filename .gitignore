@@ -27,3 +27,4 @@ latodo_api-*.tar
 
 .env
 
+swagger.json

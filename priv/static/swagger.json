@@ -36,6 +36,14 @@
       "type": "object"
     }
   },
+  "securityDefinitions": {
+    "Bearer": {
+      "in": "header",
+      "name": "Authorization",
+      "type": "apiKey",
+      "description": "API Token must be provided via `Authorization: Bearer ` header"
+    }
+  },
   "paths": {
     "/api/tasks": {
       "get": {
@@ -193,13 +201,5 @@
       }
     }
   },
-  "swagger": "2.0",
-  "securityDefinitions": {
-    "Bearer": {
-      "in": "header",
-      "name": "Authorization",
-      "type": "apiKey",
-      "description": "API Token must be provided via `Authorization: Bearer ` header"
-    }
-  }
+  "swagger": "2.0"
 }

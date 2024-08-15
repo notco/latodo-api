@@ -4,6 +4,7 @@ defmodule LatodoApiWeb.TaskControllerTest do
   import LatodoApi.TodosFixtures
 
   alias LatodoApi.Todos.Task
+  alias LatodoApi.UserAuth
 
   @create_attrs %{
     status: "some status",
@@ -20,7 +21,14 @@ defmodule LatodoApiWeb.TaskControllerTest do
   @invalid_attrs %{status: nil, title: nil, details: nil, order: nil}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    UserAuth.register(%{email: "test@email.com", password: "LawAdvisor2019!"})
+    {:ok, token} = UserAuth.sign_in("test@email.com", "LawAdvisor2019!")
+    conn =
+      conn
+      |> put_req_header("authorization", "Bearer " <> token.token)
+      |> put_req_header("accept", "application/json")
+
+    {:ok, conn: conn}
   end
 
   describe "index" do
@@ -32,7 +40,7 @@ defmodule LatodoApiWeb.TaskControllerTest do
 
   describe "create task" do
     test "renders task when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/tasks", task: @create_attrs)
+      conn = post(conn, ~p"/api/tasks", @create_attrs)
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, ~p"/api/tasks/#{id}")
@@ -47,7 +55,7 @@ defmodule LatodoApiWeb.TaskControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/api/tasks", task: @invalid_attrs)
+      conn = post(conn, ~p"/api/tasks", @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -56,7 +64,7 @@ defmodule LatodoApiWeb.TaskControllerTest do
     setup [:create_task]
 
     test "renders task when data is valid", %{conn: conn, task: %Task{id: id} = task} do
-      conn = put(conn, ~p"/api/tasks/#{task}", task: @update_attrs)
+      conn = put(conn, ~p"/api/tasks/#{task}", @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn = get(conn, ~p"/api/tasks/#{id}")
@@ -71,7 +79,7 @@ defmodule LatodoApiWeb.TaskControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn, task: task} do
-      conn = put(conn, ~p"/api/tasks/#{task}", task: @invalid_attrs)
+      conn = put(conn, ~p"/api/tasks/#{task}", @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end

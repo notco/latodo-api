@@ -11,8 +11,6 @@ defmodule LatodoApi.UserAuth do
   # :crypto.strong_rand_bytes(30) 
   # |> Base.url_encode64 
   # |> binary_part(0, 30)
-  @seed System.get_env("TOKEN_SEED")
-  @secret System.get_env("TOKEN_SECRET")
 
   def authenticate(conn, _default) do
     case get_auth_token(conn) do
@@ -29,11 +27,16 @@ defmodule LatodoApi.UserAuth do
   end
 
   def generate_token(id) do
-    Phoenix.Token.sign(@secret, @seed, id, max_age: 86400)
+    seed = System.get_env("TOKEN_SEED")
+    secret = System.get_env("TOKEN_SECRET")
+    Phoenix.Token.sign(secret, seed, id, max_age: 86400)
   end
 
   def verify_token(token) do
-    case Phoenix.Token.verify(@secret, @seed, token, max_age: 86400) do
+    seed = System.get_env("TOKEN_SEED")
+    secret = System.get_env("TOKEN_SECRET")
+
+    case Phoenix.Token.verify(secret, seed, token, max_age: 86400) do
       {:ok, _id} -> {:ok, token}
       error -> error
     end
@@ -44,6 +47,12 @@ defmodule LatodoApi.UserAuth do
       {:ok, token} -> verify_token(token)
       error -> error
     end
+  end
+
+  def register(attrs) do
+    %User{}
+    |> User.registration_changeset(attrs)
+    |> Repo.insert()
   end
 
   def sign_in(email, password) do
